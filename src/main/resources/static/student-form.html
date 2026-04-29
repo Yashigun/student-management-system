@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Student Form | SMS</title>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#fff;color:#1a1a1a;display:flex;min-height:100vh;line-height:1.5}
+    .sidebar{width:220px;background:#1a1a1a;position:fixed;top:0;left:0;height:100vh;display:flex;flex-direction:column;overflow-y:auto;z-index:10}
+    .brand{padding:24px;border-bottom:1px solid #2a2a2a}
+    .brand-title{color:#fff;font-size:15px;font-weight:700}
+    .brand-sub{color:#555;font-size:10px;letter-spacing:.08em;text-transform:uppercase;margin-top:3px}
+    .nav-section{color:#444;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:20px 24px 8px}
+    .nav-link{display:block;color:#888;text-decoration:none;padding:10px 24px;font-size:14px;transition:color .15s,background .15s}
+    .nav-link:hover{color:#fff;background:rgba(255,255,255,.04)}
+    .nav-link.active{color:#fff}
+    .main{margin-left:220px;padding:40px 48px;flex:1;min-width:0;max-width:860px}
+    .page-title{font-size:22px;font-weight:700;letter-spacing:-.3px;margin-bottom:32px}
+    .section-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:#888;margin-bottom:20px;padding-bottom:10px;border-bottom:1px solid #f0f0f0}
+    .form-section{margin-bottom:36px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:0 32px}
+    .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 32px}
+    @media(max-width:700px){.grid,.grid-3{grid-template-columns:1fr}}
+    .field{margin-bottom:24px}
+    label{display:block;font-size:12px;color:#888;margin-bottom:6px}
+    input,select,textarea{font-family:inherit;font-size:14px;color:#1a1a1a;background:transparent;border:none;border-bottom:1px solid #d0d0d0;padding:8px 0;outline:none;transition:border-color .15s;width:100%}
+    input:focus,select:focus,textarea:focus{border-bottom-color:#1a1a1a}
+    input::placeholder,textarea::placeholder{color:#c0c0c0}
+    select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23888' d='M5 6L0 0h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 4px center;cursor:pointer}
+    textarea{resize:vertical;min-height:70px}
+    .photo-section{display:flex;align-items:flex-start;gap:24px;margin-bottom:24px}
+    .photo-preview{width:80px;height:80px;border-radius:50%;background:#f0f0f0;object-fit:cover;display:flex;align-items:center;justify-content:center;color:#b0b0b0;font-size:28px;overflow:hidden;flex-shrink:0}
+    .photo-preview img{width:100%;height:100%;object-fit:cover}
+    .photo-upload-label{font-size:13px;color:#1a1a1a;cursor:pointer;text-decoration:underline;display:block;margin-bottom:6px}
+    .photo-hint{font-size:12px;color:#b0b0b0}
+    input[type=file]{display:none}
+    .btn-row{display:flex;gap:12px;margin-top:8px}
+    .btn{font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;border:none;border-radius:2px;padding:10px 22px;transition:opacity .15s;text-decoration:none;display:inline-block}
+    .btn:hover{opacity:.75}
+    .btn-dark{background:#1a1a1a;color:#fff}
+    .btn-outline{background:transparent;color:#888;border:1px solid #d0d0d0}
+    #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(8px);background:#1a1a1a;color:#fff;font-size:13px;padding:10px 20px;border-radius:2px;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:100}
+    #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  </style>
+</head>
+<body>
+<nav class="sidebar">
+  <div class="brand">
+    <div class="brand-title">Student MS</div>
+    <div class="brand-sub">Management System</div>
+  </div>
+  <div class="nav-section">Menu</div>
+  <a href="index.html" class="nav-link">Students</a>
+  <a href="student-form.html" class="nav-link active">Add Student</a>
+  <a href="attendance.html" class="nav-link">Attendance</a>
+</nav>
+
+<div class="main">
+  <h1 class="page-title" id="form-title">Add Student</h1>
+
+  <div class="form-section">
+    <div class="section-label">Profile Photo</div>
+    <div class="photo-section">
+      <div class="photo-preview" id="photo-preview">
+        <span id="photo-placeholder">+</span>
+        <img id="photo-img" style="display:none">
+      </div>
+      <div>
+        <label class="photo-upload-label" for="photo-input">Upload photo</label>
+        <div class="photo-hint">JPG or PNG, max 5MB</div>
+        <input type="file" id="photo-input" accept="image/*" onchange="previewPhoto(this)">
+      </div>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <div class="section-label">Basic Info</div>
+    <div class="grid">
+      <div class="field">
+        <label>Full Name</label>
+        <input type="text" id="name" placeholder="e.g. Alice Johnson">
+      </div>
+      <div class="field">
+        <label>Date of Birth</label>
+        <input type="date" id="dob">
+      </div>
+      <div class="field">
+        <label>Gender</label>
+        <select id="gender">
+          <option value="">Select gender</option>
+          <option>Male</option>
+          <option>Female</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="email" placeholder="e.g. alice@example.com">
+      </div>
+      <div class="field">
+        <label>Phone</label>
+        <input type="tel" id="phone" placeholder="e.g. 9876543210">
+      </div>
+    </div>
+    <div class="field">
+      <label>Address</label>
+      <textarea id="address" placeholder="Full address..."></textarea>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <div class="section-label">Academic Info</div>
+    <div class="grid">
+      <div class="field">
+        <label>Class</label>
+        <select id="className">
+          <option value="">Select class</option>
+          <option>1</option><option>2</option><option>3</option><option>4</option>
+          <option>5</option><option>6</option><option>7</option><option>8</option>
+          <option>9</option><option>10</option><option>11</option><option>12</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Section</label>
+        <select id="section">
+          <option value="">Select section</option>
+          <option>A</option><option>B</option><option>C</option><option>D</option><option>E</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-section">
+    <div class="section-label">Parent / Guardian</div>
+    <div class="grid">
+      <div class="field">
+        <label>Parent Name</label>
+        <input type="text" id="parentName" placeholder="e.g. Robert Johnson">
+      </div>
+      <div class="field">
+        <label>Parent Phone</label>
+        <input type="tel" id="parentPhone" placeholder="e.g. 9876543210">
+      </div>
+      <div class="field">
+        <label>Parent Email</label>
+        <input type="email" id="parentEmail" placeholder="e.g. robert@example.com">
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-dark" onclick="submit()">Save Student</button>
+    <a href="index.html" class="btn btn-outline">Cancel</a>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  const params = new URLSearchParams(location.search);
+  const editId = params.get('id');
+  let photoFile = null;
+
+  if (editId) {
+    document.getElementById('form-title').textContent = 'Edit Student';
+    loadStudent(editId);
+  }
+
+  async function loadStudent(id) {
+    try {
+      const s = await fetch('/students/' + id).then(r => r.json());
+      document.getElementById('name').value = s.name || '';
+      document.getElementById('dob').value = s.dateOfBirth || '';
+      document.getElementById('gender').value = s.gender || '';
+      document.getElementById('email').value = s.email || '';
+      document.getElementById('phone').value = s.phone || '';
+      document.getElementById('address').value = s.address || '';
+      document.getElementById('className').value = s.className || '';
+      document.getElementById('section').value = s.section || '';
+      document.getElementById('parentName').value = s.parentName || '';
+      document.getElementById('parentPhone').value = s.parentPhone || '';
+      document.getElementById('parentEmail').value = s.parentEmail || '';
+      if (s.profilePhoto) {
+        document.getElementById('photo-img').src = s.profilePhoto;
+        document.getElementById('photo-img').style.display = 'block';
+        document.getElementById('photo-placeholder').style.display = 'none';
+      }
+    } catch {
+      toast('Failed to load student data.');
+    }
+  }
+
+  function previewPhoto(input) {
+    if (!input.files || !input.files[0]) return;
+    photoFile = input.files[0];
+    const reader = new FileReader();
+    reader.onload = e => {
+      document.getElementById('photo-img').src = e.target.result;
+      document.getElementById('photo-img').style.display = 'block';
+      document.getElementById('photo-placeholder').style.display = 'none';
+    };
+    reader.readAsDataURL(photoFile);
+  }
+
+  async function submit() {
+    const name = document.getElementById('name').value.trim();
+    if (!name) { toast('Name is required.'); return; }
+
+    const payload = {
+      name,
+      dateOfBirth: document.getElementById('dob').value || null,
+      gender: document.getElementById('gender').value,
+      email: document.getElementById('email').value.trim(),
+      phone: document.getElementById('phone').value.trim(),
+      address: document.getElementById('address').value.trim(),
+      className: document.getElementById('className').value,
+      section: document.getElementById('section').value,
+      parentName: document.getElementById('parentName').value.trim(),
+      parentPhone: document.getElementById('parentPhone').value.trim(),
+      parentEmail: document.getElementById('parentEmail').value.trim()
+    };
+
+    try {
+      let student;
+      if (editId) {
+        student = await fetch('/students/' + editId, {
+          method: 'PUT',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        }).then(r => r.json());
+      } else {
+        student = await fetch('/students', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        }).then(r => r.json());
+      }
+
+      if (photoFile) {
+        const fd = new FormData();
+        fd.append('photo', photoFile);
+        await fetch('/students/' + student.id + '/photo', { method: 'POST', body: fd });
+      }
+
+      location.href = 'index.html';
+    } catch {
+      toast('Save failed. Please try again.');
+    }
+  }
+
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+</script>
+</body>
+</html>

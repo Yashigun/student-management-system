@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Profile | SMS</title>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#fff;color:#1a1a1a;display:flex;min-height:100vh;line-height:1.5}
+    .sidebar{width:220px;background:#1a1a1a;position:fixed;top:0;left:0;height:100vh;display:flex;flex-direction:column;overflow-y:auto;z-index:10}
+    .brand{padding:24px;border-bottom:1px solid #2a2a2a}
+    .brand-title{color:#fff;font-size:15px;font-weight:700}
+    .brand-sub{color:#555;font-size:10px;letter-spacing:.08em;text-transform:uppercase;margin-top:3px}
+    .nav-section{color:#444;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:20px 24px 8px}
+    .nav-link{display:block;color:#888;text-decoration:none;padding:10px 24px;font-size:14px;transition:color .15s,background .15s}
+    .nav-link:hover{color:#fff;background:rgba(255,255,255,.04)}
+    .nav-link.active{color:#fff}
+    .main{margin-left:220px;padding:40px 48px;flex:1;min-width:0}
+    .back{font-size:13px;color:#888;text-decoration:none;display:inline-flex;align-items:center;gap:6px;margin-bottom:24px}
+    .back:hover{color:#1a1a1a}
+    .profile-header{display:flex;align-items:center;gap:24px;margin-bottom:36px;padding-bottom:36px;border-bottom:1px solid #f0f0f0}
+    .avatar-lg{width:100px;height:100px;border-radius:50%;object-fit:cover;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:600;color:#888;flex-shrink:0;overflow:hidden}
+    .avatar-lg img{width:100%;height:100%;object-fit:cover}
+    .profile-meta h2{font-size:22px;font-weight:700;letter-spacing:-.3px;margin-bottom:6px}
+    .profile-meta .sub{font-size:14px;color:#888;margin-bottom:10px}
+    .badge{display:inline-block;font-size:10px;font-weight:700;padding:3px 8px;border-radius:2px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border:none;font-family:inherit}
+    .badge-active{background:#1a1a1a;color:#fff}
+    .badge-inactive{background:#f0f0f0;color:#999}
+    .header-actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+    .btn{font-family:inherit;font-size:13px;font-weight:500;cursor:pointer;border:none;border-radius:2px;padding:9px 18px;transition:opacity .15s;text-decoration:none;display:inline-block}
+    .btn:hover{opacity:.75}
+    .btn-dark{background:#1a1a1a;color:#fff}
+    .btn-ghost{background:transparent;color:#888;border:1px solid #e8e8e8;font-size:12px;padding:7px 14px}
+    .btn-ghost:hover{color:#1a1a1a;border-color:#1a1a1a;opacity:1}
+    .cards{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:36px}
+    @media(max-width:700px){.cards{grid-template-columns:1fr}}
+    .card{border:1px solid #f0f0f0;border-radius:4px;padding:20px}
+    .card-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:#888;margin-bottom:16px}
+    .info-row{display:flex;justify-content:space-between;align-items:baseline;padding:8px 0;border-bottom:1px solid #f8f8f8;font-size:14px}
+    .info-row:last-child{border-bottom:none}
+    .info-label{color:#888;font-size:13px}
+    .info-val{color:#1a1a1a;text-align:right;max-width:60%}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:36px}
+    .stat{text-align:center;padding:16px;background:#fafafa;border-radius:4px}
+    .stat-val{font-size:22px;font-weight:700;margin-bottom:4px}
+    .stat-label{font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.06em}
+    .section-title{font-size:13px;font-weight:700;letter-spacing:-.1px;margin-bottom:16px;margin-top:36px;display:flex;align-items:center;justify-content:space-between}
+    table{width:100%;border-collapse:collapse;margin-bottom:24px}
+    thead th{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:#888;padding:0 12px 12px 0;text-align:left;border-bottom:1px solid #e8e8e8}
+    thead th:last-child{text-align:right;padding-right:0}
+    tbody tr{border-bottom:1px solid #f5f5f5}
+    tbody tr:hover{background:#fafafa}
+    tbody td{font-size:14px;padding:12px 12px 12px 0;vertical-align:middle}
+    tbody td:last-child{text-align:right;padding-right:0}
+    .grade{font-weight:600}
+    .grade-ap{color:#1a1a1a}
+    .grade-a{color:#333}
+    .grade-b{color:#555}
+    .grade-c{color:#777}
+    .grade-d,.grade-f{color:#aaa}
+    .marks-form{display:grid;grid-template-columns:1fr 1fr 80px 80px auto;gap:12px;align-items:end;margin-bottom:24px;padding:16px;background:#fafafa;border-radius:4px}
+    .marks-form input,.marks-form select{border-bottom:1px solid #d0d0d0;background:transparent;font-family:inherit;font-size:14px;padding:6px 0;outline:none;transition:border-color .15s;width:100%}
+    .marks-form input:focus,.marks-form select:focus{border-bottom-color:#1a1a1a}
+    .marks-form select{appearance:none;-webkit-appearance:none;cursor:pointer}
+    .marks-form label{display:block;font-size:11px;color:#888;margin-bottom:6px}
+    .empty{text-align:center;padding:32px 0;color:#b0b0b0;font-size:14px}
+    .total-row td{font-weight:600;border-top:2px solid #e8e8e8;padding-top:14px}
+    #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(8px);background:#1a1a1a;color:#fff;font-size:13px;padding:10px 20px;border-radius:2px;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:100}
+    #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  </style>
+</head>
+<body>
+<nav class="sidebar">
+  <div class="brand">
+    <div class="brand-title">Student MS</div>
+    <div class="brand-sub">Management System</div>
+  </div>
+  <div class="nav-section">Menu</div>
+  <a href="index.html" class="nav-link">Students</a>
+  <a href="student-form.html" class="nav-link">Add Student</a>
+  <a href="attendance.html" class="nav-link">Attendance</a>
+</nav>
+
+<div class="main">
+  <a href="index.html" class="back">&#8592; Back to Students</a>
+
+  <div class="profile-header">
+    <div class="avatar-lg" id="avatar">
+      <img id="avatar-img" style="display:none">
+      <span id="avatar-init"></span>
+    </div>
+    <div class="profile-meta">
+      <h2 id="s-name">Loading...</h2>
+      <div class="sub" id="s-sub"></div>
+      <button class="badge" id="status-badge" onclick="toggleStatus()"></button>
+    </div>
+    <div class="header-actions">
+      <a id="edit-btn" href="#" class="btn btn-dark">Edit</a>
+      <button class="btn btn-ghost" onclick="deleteStudent()">Delete</button>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-title">Basic Info</div>
+      <div class="info-row"><span class="info-label">ID</span><span class="info-val" id="i-id"></span></div>
+      <div class="info-row"><span class="info-label">Date of Birth</span><span class="info-val" id="i-dob"></span></div>
+      <div class="info-row"><span class="info-label">Gender</span><span class="info-val" id="i-gender"></span></div>
+      <div class="info-row"><span class="info-label">Email</span><span class="info-val" id="i-email"></span></div>
+      <div class="info-row"><span class="info-label">Phone</span><span class="info-val" id="i-phone"></span></div>
+      <div class="info-row"><span class="info-label">Address</span><span class="info-val" id="i-address"></span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Parent / Guardian</div>
+      <div class="info-row"><span class="info-label">Name</span><span class="info-val" id="i-pname"></span></div>
+      <div class="info-row"><span class="info-label">Phone</span><span class="info-val" id="i-pphone"></span></div>
+      <div class="info-row"><span class="info-label">Email</span><span class="info-val" id="i-pemail"></span></div>
+    </div>
+  </div>
+
+  <div class="section-title">
+    Attendance
+    <a id="att-link" href="#" class="btn btn-ghost">Manage Attendance</a>
+  </div>
+  <div class="stats" id="att-stats">
+    <div class="stat"><div class="stat-val" id="att-total">-</div><div class="stat-label">Total Days</div></div>
+    <div class="stat"><div class="stat-val" id="att-present">-</div><div class="stat-label">Present</div></div>
+    <div class="stat"><div class="stat-val" id="att-absent">-</div><div class="stat-label">Absent</div></div>
+    <div class="stat"><div class="stat-val" id="att-pct">-</div><div class="stat-label">Attendance %</div></div>
+  </div>
+
+  <div class="section-title">Marks</div>
+
+  <div class="marks-form">
+    <div>
+      <label>Subject</label>
+      <input type="text" id="m-subject" placeholder="e.g. Mathematics">
+    </div>
+    <div>
+      <label>Exam Type</label>
+      <input type="text" id="m-exam" placeholder="e.g. Final">
+    </div>
+    <div>
+      <label>Obtained</label>
+      <input type="number" id="m-obtained" min="0" placeholder="85">
+    </div>
+    <div>
+      <label>Total</label>
+      <input type="number" id="m-total" min="1" placeholder="100">
+    </div>
+    <div>
+      <label>&nbsp;</label>
+      <button class="btn btn-dark" onclick="addMarks()">Add</button>
+    </div>
+  </div>
+
+  <table id="marks-table">
+    <thead>
+      <tr>
+        <th>Subject</th>
+        <th>Exam Type</th>
+        <th>Marks</th>
+        <th>Total</th>
+        <th>%</th>
+        <th>Grade</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="marks-body">
+      <tr><td colspan="7" class="empty">No marks added yet.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  const params = new URLSearchParams(location.search);
+  const sid = params.get('id');
+  let student = null;
+
+  if (!sid) { location.href = 'index.html'; }
+
+  async function init() {
+    await loadStudent();
+    loadAttendance();
+    loadMarks();
+  }
+
+  async function loadStudent() {
+    try {
+      student = await fetch('/students/' + sid).then(r => r.json());
+      document.getElementById('s-name').textContent = student.name || '';
+      document.getElementById('s-sub').textContent = [
+        student.className ? 'Class ' + student.className : '',
+        student.section ? 'Section ' + student.section : ''
+      ].filter(Boolean).join(' | ');
+
+      const badge = document.getElementById('status-badge');
+      badge.textContent = student.status || '';
+      badge.className = 'badge badge-' + (student.status || '').toLowerCase();
+
+      document.getElementById('edit-btn').href = 'student-form.html?id=' + sid;
+      document.getElementById('att-link').href = 'attendance.html?id=' + sid;
+
+      if (student.profilePhoto) {
+        document.getElementById('avatar-img').src = student.profilePhoto;
+        document.getElementById('avatar-img').style.display = 'block';
+        document.getElementById('avatar-init').style.display = 'none';
+      } else {
+        document.getElementById('avatar-init').textContent = (student.name || '?')[0].toUpperCase();
+      }
+
+      document.getElementById('i-id').textContent = '#' + student.id;
+      document.getElementById('i-dob').textContent = student.dateOfBirth || '-';
+      document.getElementById('i-gender').textContent = student.gender || '-';
+      document.getElementById('i-email').textContent = student.email || '-';
+      document.getElementById('i-phone').textContent = student.phone || '-';
+      document.getElementById('i-address').textContent = student.address || '-';
+      document.getElementById('i-pname').textContent = student.parentName || '-';
+      document.getElementById('i-pphone').textContent = student.parentPhone || '-';
+      document.getElementById('i-pemail').textContent = student.parentEmail || '-';
+    } catch {
+      toast('Failed to load student.');
+    }
+  }
+
+  async function loadAttendance() {
+    try {
+      const a = await fetch('/attendance/' + sid + '/summary').then(r => r.json());
+      document.getElementById('att-total').textContent = a.total;
+      document.getElementById('att-present').textContent = a.present;
+      document.getElementById('att-absent').textContent = a.absent;
+      document.getElementById('att-pct').textContent = a.percentage.toFixed(1) + '%';
+    } catch {}
+  }
+
+  async function loadMarks() {
+    try {
+      const s = await fetch('/marks/' + sid + '/summary').then(r => r.json());
+      const tbody = document.getElementById('marks-body');
+      if (!s.details || !s.details.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="empty">No marks added yet.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = s.details.map(d => `
+        <tr>
+          <td>${esc(d.subject)}</td>
+          <td style="color:#888">${esc(d.examType)}</td>
+          <td>${d.marksObtained}</td>
+          <td>${d.totalMarks}</td>
+          <td>${d.percentage.toFixed(1)}%</td>
+          <td class="grade grade-${gradeClass(d.grade)}">${d.grade}</td>
+          <td><button class="btn btn-ghost" onclick="deleteMarks(${d.id})">Remove</button></td>
+        </tr>
+      `).join('') + `
+        <tr class="total-row">
+          <td colspan="2">Overall</td>
+          <td>${s.totalObtained}</td>
+          <td>${s.totalMax}</td>
+          <td>${s.percentage.toFixed(1)}%</td>
+          <td class="grade grade-${gradeClass(s.grade)}">${s.grade}</td>
+          <td></td>
+        </tr>
+      `;
+    } catch {}
+  }
+
+  async function addMarks() {
+    const subject = document.getElementById('m-subject').value.trim();
+    const examType = document.getElementById('m-exam').value.trim();
+    const marksObtained = parseInt(document.getElementById('m-obtained').value);
+    const totalMarks = parseInt(document.getElementById('m-total').value);
+    if (!subject || !examType || isNaN(marksObtained) || isNaN(totalMarks) || totalMarks < 1) {
+      toast('Fill all mark fields correctly.');
+      return;
+    }
+    try {
+      await fetch('/marks', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ studentId: +sid, subject, examType, marksObtained, totalMarks })
+      });
+      ['m-subject','m-exam','m-obtained','m-total'].forEach(id => document.getElementById(id).value = '');
+      toast('Marks added.');
+      loadMarks();
+    } catch {
+      toast('Failed to add marks.');
+    }
+  }
+
+  async function deleteMarks(id) {
+    try {
+      await fetch('/marks/' + id, { method: 'DELETE' });
+      toast('Marks removed.');
+      loadMarks();
+    } catch {
+      toast('Failed to remove marks.');
+    }
+  }
+
+  async function toggleStatus() {
+    if (!student) return;
+    const newStatus = student.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+    try {
+      await fetch('/students/' + sid + '/status?status=' + newStatus, { method: 'PATCH' });
+      await loadStudent();
+      toast('Status updated to ' + newStatus + '.');
+    } catch {
+      toast('Status update failed.');
+    }
+  }
+
+  async function deleteStudent() {
+    if (!confirm('Permanently delete this student and all their data?')) return;
+    try {
+      await fetch('/students/' + sid, { method: 'DELETE' });
+      location.href = 'index.html';
+    } catch {
+      toast('Delete failed.');
+    }
+  }
+
+  function gradeClass(g) {
+    if (g === 'A+') return 'ap';
+    return (g || 'f').toLowerCase();
+  }
+
+  function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  function toast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  init();
+</script>
+</body>
+</html>
