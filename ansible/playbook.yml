@@ -1,0 +1,56 @@
+---
+- name: Deploy Student Management System to Kubernetes
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+
+    - name: Apply namespace
+      ansible.builtin.shell: kubectl apply -f k8s/namespace.yaml
+      args:
+        chdir: "{{ playbook_dir }}/.."
+      register: namespace_result
+
+    - name: Show namespace result
+      ansible.builtin.debug:
+        msg: "{{ namespace_result.stdout }}"
+
+    - name: Apply deployment
+      ansible.builtin.shell: kubectl apply -f k8s/deployment.yaml
+      args:
+        chdir: "{{ playbook_dir }}/.."
+      register: deployment_result
+
+    - name: Show deployment result
+      ansible.builtin.debug:
+        msg: "{{ deployment_result.stdout }}"
+
+    - name: Apply service
+      ansible.builtin.shell: kubectl apply -f k8s/service.yaml
+      args:
+        chdir: "{{ playbook_dir }}/.."
+      register: service_result
+
+    - name: Show service result
+      ansible.builtin.debug:
+        msg: "{{ service_result.stdout }}"
+
+    - name: Wait 30 seconds for pods to initialize
+      ansible.builtin.shell: sleep 30
+
+    - name: Get pods in student-ns
+      ansible.builtin.shell: kubectl get pods -n student-ns
+      register: pods_output
+
+    - name: Print pod status
+      ansible.builtin.debug:
+        msg: "{{ pods_output.stdout }}"
+
+    - name: Get services in student-ns
+      ansible.builtin.shell: kubectl get svc -n student-ns
+      register: svc_output
+
+    - name: Print service status
+      ansible.builtin.debug:
+        msg: "{{ svc_output.stdout }}"
